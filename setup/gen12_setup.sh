@@ -3,15 +3,14 @@ if (( $EUID != 0 )); then
     exit
 fi
 
+apt update
+apt install -y gpg-agent wget
+wget -qO - https://repositories.intel.com/graphics/intel-graphics.key | gpg --dearmor --output /usr/share/keyrings/intel-graphics.gpg
+echo 'deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/graphics/ubuntu jammy arc' | tee  /etc/apt/sources.list.d/intel.gpu.jammy.list
+
+
 apt-get update
 
-apt-get -y install \
-    gawk \
-    dkms \
-    linux-headers-$(uname -r) \
-    libc6-dev udev
-/
-apt-get install -y intel-platform-vsec-dkms intel-platform-cse-dkms intel-i915-dkms intel-fw-gpu
 apt-get install -y \
   intel-opencl-icd intel-level-zero-gpu level-zero \
   intel-media-va-driver-non-free libmfx1 libmfxgen1 libvpl2 \

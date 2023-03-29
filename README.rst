@@ -29,45 +29,28 @@ This project will give teams better assurance that their work is not breaking th
 
 **For both**:  Clarity about what is expected to work means more efficiency for everyone.  
 
-<<<<<<< HEAD
+Challenges: 
+ - composable stack definitions in metapackages.  See https://github.com/intel-sandbox/jpk.package-test/blob/main/docs/meta-packages.md
+ - cross-team alignment.  Need to get buy-in from multiple projects to use these tests.  Also must navigate what each team believes they own so that this project will be seen as adding value vs. simply duplicating effort.
+
 
 Coverage/Intended Scope       
 -----------------------
 
 The scope of what we are claiming will work together includes:
-=======
-Challenges: aligned definition of composeable stacks, planning a course for this project so it will be seen as a helpful addition to 
-the many teams working in this space instead of duplicated effort.
 
-Overview/Intended Scope       
------------------------
-
-The scope of what we are claiming will work together includes:
-
->>>>>>> 8881ce2 (Signs of life)
  #. intel-gpu-media (media driver, libva, VPL)
  #. Additional graphics APIs (Vulkan, OpenGL, ...)
  #. Media frameworks + VPL plugins (FFmpeg *_qsv codecs and GStreamer MediaSDK plugin)
  #. intel-gpu-compute and projects that work on top of it (oneAPI, OpenVINO, ITEX, IPEX)
 
 
-<<<<<<< HEAD
-Overview
---------
-
 This project provides a set of basic command lines runnable by internal teams and customers to evaluate if their environment is 
-set up correctly to support our interoperability claims 
-=======
-This project provides a set of basic command lines runnable by internal teams and customers to evaluate if their environment is 
-set up correctly to support our interoperability claims.  These include basic environment diagnostics as well as functional 
-command lines for target use cases.  
+set up correctly to support our interoperability claims.  
 
-As smoke tests, all we check for now is if the command line runs.  Additional checks can be added for correct output but usually if
-there is a stack incompatibility it is obvious.
+As smoke tests we simply check for crash, empty output, etc.  More sophisticated tests can be added as interoperability improves.
 
-This project intentially skips KPIs for now, but could easily be extended to KPIs later.
- 
->>>>>>> 8881ce2 (Signs of life)
+KPIs are out of scope.  They could be added but we don't want to disrupt any current KPI ownership or HW program milestones. 
 
 
 Supported Hardware
@@ -80,7 +63,9 @@ Project currently supports Xe and newer GPUs, including Intel(r) Arc(tm) A-serie
 Setup Steps
 ------------
 
-Run setup/setup.sh on test system, bare metal Ubuntu 22.04 or in fresh Docker Ubuntu 22.04 container
+Run setup/setup.sh on test system, bare metal Ubuntu 22.04 or in fresh Docker Ubuntu 22.04 container.
+
+Note: setup steps are for bootstrapping only.  Purpose of the customer runnable steps is to test the installed stack.
 
 
 How to Run Tests
@@ -91,6 +76,6 @@ Contributing
 ------------
 
 Feedback and contributions are welcome. Please, submit
-`issues https://github.com/jeffreymcallister/customer_runnable_smoke_tests/issues>`_ and
-`pull requests <https://github.com/jeffreymcallister/customer_runnable_smoke_tests/pulls>`_ here at GitHub.
+ - **issues** https://github.com/jeffreymcallister/customer_runnable_smoke_tests/issues
+ - **pull requests** https://github.com/jeffreymcallister/customer_runnable_smoke_tests/pulls
 
