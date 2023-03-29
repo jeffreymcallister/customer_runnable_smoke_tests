@@ -1,0 +1,66 @@
+---
+
+layername: mediadriver_stack
+install_prefix: /usr/local
+base: ubuntu:22.04
+
+steps:
+
+- name: setup
+  buildsystem: shell
+  commands:
+   - apt update 
+   - apt install -y meson ninja-build autogen autoconf cmake build-essential git libtool libx11-xcb1 libxatracker2 libxcb-dri3-0 libxcb-present0 pkg-config python3 python3-pip wget yasm unzip vim 
+
+
+
+- name: util-macros
+  buildsystem: autotools
+  dir: macros
+  giturl: https://gitlab.freedesktop.org/xorg/util/macros.git
+  branch: util-macros-1.20.0
+
+- name: libdrm
+  buildsystem: meson
+  dir: drm
+  giturl: https://gitlab.freedesktop.org/mesa/drm.git
+  branch: libdrm-2.4.115
+
+- name: libva
+  buildsystem: meson
+  dir: libva
+  giturl: https://github.com/intel/libva.git
+  branch: 2.17.0
+
+- name: libva-utils
+  buildsystem: meson
+  dir: libva-utils
+  giturl: https://github.com/intel/libva-utils.git
+  branch: 2.17.0
+
+- name: gmmlib
+  buildsystem: cmake
+  dir: gmmlib
+  giturl: https://github.com/intel/gmmlib.git
+  branch: intel-gmmlib-22.3.3
+
+- name: intel-media-driver
+  buildsystem: cmake
+  dir: media-driver
+  config-opts: -DENABLE_PRODUCTION_KMD=ON
+  giturl:  https://github.com/intel/media-driver.git
+  branch: intel-media-22.6.5
+
+- name: intel-onevpl-gpu
+  buildsystem: cmake
+  dir: oneVPL-intel-gpu
+  config-opts: "-DMFX_ENABLE_AENC=ON"
+  giturl: https://github.com/oneapi-src/oneVPL-intel-gpu.git
+  branch: intel-onevpl-22.6.5
+
+- name: intel-onevpl-dispatcher
+  buildsystem: cmake
+  dir: oneVPL
+  config-opts: "-DCMAKE_INSTALL_PREFIX=/usr/local"
+  giturl: https://github.com/oneapi-src/oneVPL.git
+  branch: v2023.1.3

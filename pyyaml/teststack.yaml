@@ -1,0 +1,6 @@
+---
+os: ubuntu:22.04
+name: teststack
+stack_layers:
+#layers are set up in reading order (top down)
+  - mediadriver_v001.yaml

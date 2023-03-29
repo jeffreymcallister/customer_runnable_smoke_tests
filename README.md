@@ -1,1 +1,0 @@
-# customer_runnable_smoke_tests
