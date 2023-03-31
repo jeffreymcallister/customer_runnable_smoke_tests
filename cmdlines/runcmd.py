@@ -13,8 +13,8 @@ import os.path
 import sys
 from contextlib import contextmanager
 import yaml
-#import pexpect
 import subprocess
+from termcolor import colored
 
 def config_file(path):
     """
@@ -34,8 +34,8 @@ def read_command_line(cmd_line=None):
         description=globals()['__doc__'],
         formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-c", "--config", type=config_file, help="Configuration file", required=True)
-    parser.add_argument("-o", "--output", help="Destination file", default="cmds.md")
-    parser.add_argument("-f", "--format", choices=["shell", "md"], default="shell")
+    parser.add_argument("-o", "--output", help="Destination file", default="cmds.rst")
+    parser.add_argument("-f", "--format", choices=["shell", "rst"], default="shell")
     # parse arguments (will exit here on invalid args or help)
 
     try:
@@ -52,30 +52,34 @@ def read_command_line(cmd_line=None):
 
     
 
-def process_cmd_shell(step, outfile):
-    print("running "+step['name'])
+def process_cmd_shell(step):
+    stepname=step['name']
+    print(f"running {stepname:<30}",end=" ")
     cmd=""
     for cmdstep in step['commands']:
-        print(cmd+"\n")
-        cmd+=cmdstep + " && "
+        cmd+=cmdstep + "; "
     cmd+=" echo ''"
     
-    out=subprocess.run(cmd,shell=True,capture_output=True)
+    out=subprocess.run(cmd,shell=True,capture_output=True, executable='/bin/bash')
     #print(cmd)
-    #print(out.stdout)
+    #print(out.stdout+out.stderr)
     expected_out=step['expect']
-    if (str(expected_out) in str(out.stdout)): print("PASS")
-    else: print("FAIL")
+    if (str(expected_out) in str(out.stdout)): print(colored("PASS",'green'))
+    else: print(colored("FAIL",'red'))
 
-def process_cmd_md(step, outfile):
+def process_cmd_rst(step, outfile):
     print("adding "+step['name'])
-    cmd=""
-    for cmdstep in step['commands']:
-        print(cmd+"\n")
-        cmd+=cmdstep + " && "
-    cmd+=" echo ''"
-    print(cmd)
 
+    outfile.write(step['name']+"\n")
+    outfile.write("---------------\n\n")
+    outfile.write(step['description']+"\n\n")
+    outfile.write(".. code-block:: bash\n\n")
+
+    
+    for cmdstep in step['commands']:
+        outfile.write("\t"+cmdstep+"\n")
+
+    outfile.write("\n\n")
 
 def main(args):
     """
@@ -89,13 +93,20 @@ def main(args):
             print(f"Error reading {args.config}\n{yaml_err}")
             sys.exit(1)
 
-    with open(args.output, encoding='utf-8', mode='w') as outfile:
-        print("args.format=",args.format)
+    cmdlinelist=yaml_obj['cmdlines']
 
-        steps=yaml_obj['steps']
-        for step in steps:
-            if args.format=="shell": process_cmd_shell(step, outfile)
+    if args.format=="shell": 
+        for step in cmdlinelist:
+            process_cmd_shell(step)
+    elif args.format=="rst":
+        with open(args.output, encoding='utf-8', mode='w') as outfile:
+            outfile.write("Example command lines\n")
+            outfile.write("=====================\n")
+            outfile.write("\n")
+            outfile.write(".. contents::\n\n")
 
+            for step in cmdlinelist:
+                process_cmd_rst(step,outfile)
 
 if __name__ == '__main__':
     main(read_command_line())
