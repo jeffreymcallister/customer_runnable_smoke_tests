@@ -1,0 +1,18 @@
+---
+dependencies:
+- intel-gpu-media
+
+cmdlines: 
+
+- name: Media stack signs of life 
+  description: decode a file with VPL, this shows minimal graphics stack is working
+  commands:
+   - sample_decode h265 -i content/cars_320x240.h265
+  expect: "Decoding finished"
+
+- name: Media stack ready for general use 
+  description: transcode a file with VPL, exercises most graphics stack components showing basic readiness for
+  commands:
+    - sample_multi_transcode -i::h265 content/cars_320x240.h265 -o::h265 NUL
+  expect: "PASSED"
+
