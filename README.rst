@@ -7,75 +7,58 @@ Customer Runnable Linux Media + AI Smoke Tests
 Background
 ----------
 
-Intel brings vendor choice to the GPU market.  In addition to competitive hardware, the market has said it wants an open, 
-composable stack allowing components to be plugged together like Lego blocks.  If Intel can deliver this our stack will 
-become a competitive advantage.
+Reason for adding customer runnable tests: out-of-box experience remains poor, especially beyond basic media.
 
-Unfortunately there are many gaps in this vision today.  Release dashboards are green at a component level but customer-level integration
-remains problematic.  This is still happening despite large investments in development/validation (including a dedicated E2E team)
-and heroic effort by many across all levels of development, validation, and customer enabling.  
+Approach used for this project: focus on the example command lines we would tell customers to run as they are getting started.
+This gap has been identified in multiple DX studies, so this area is clear for us to own w/o extensive negotiations.
+These command lines we document must include interoperability with more than the basic media stack.
 
-To successfully deliver the vision that the market is looking for, we need:
+Scope for test cases
+---------------------
+A *short* list (<50 total) of command lines used in our documentation. 
+ - NOT VPL-only acceptance tests
+ - NOT lower level VPL-only component level tests
 
-**Inside Intel**: an easy to run set of common smoke tests that the long list of component development+validation teams can easily add
-to what they are currently doing.  The intent is to provide a testable definition of marketing claims which historically have been too
-high level for technical teams to consider in their day-to-day work and release preparation.  Since the work of many teams must 
-integrate to this common definition we need something to enforce this definition of what is expected to work in an unambiguous/automatable
-way or details get lost very quickly.  This does not add work to busy development/validation teams -- overall this project is expected 
-to reduce validation complexity since teams can focus on specific features they are responsible for without over-testing ambiguous scope boundaries.
-This project will give teams better assurance that their work is not breaking things downstream.
+Interop scenarios are our new default.  Media only is an increasingly rare corner case.
+While it is theoretically possible to set up a system with everything, everything enabled is a rare corner case.
 
-**For customers**: Customers need a way to quickly check that their system is set up correctly. 
+Direction for Linux releases is composable packages.  Some examples of configurations to document:
+ #. apt install intel-gpu-media (VPL only)
+ #. apt install intel-gpu-media, then build ffmpeg with --enable-vpl
+ #. apt install intel-gpu-media, then build gstreamer with VPL plugin
+ #. apt install intel-gpu-media + intel-gpu-compute (openCL)
+ #. apt install intel-gpu-media + intel-gpu-compute + openvino
+ #. apt install intel-gpu-media + Vulkan
+ #. apt install intel-gpu-media + Mesa (openGL)
 
-**For both**:  Clarity about what is expected to work means more efficiency for everyone.  
+Project scope is smoke tested example command lines for every composable media stack scenario we claim in our marketing.
+We will only provide a few command lines (<5) for each package install scenario, just enough to fulfill the goal of basic
+smoke tests that the configuration works.
 
-Challenges: 
- - composable stack definitions in metapackages.  See https://github.com/intel-sandbox/jpk.package-test/blob/main/docs/meta-packages.md
- - cross-team alignment.  Need to get buy-in from multiple projects to use these tests.  Also must navigate what each team believes they own so that this project will be seen as adding value vs. simply duplicating effort.
+Subset to prioritize in Q2
+--------------------------
+Simple is hard.  Just getting buy-in on a subset of the <50 total example command lines will be challenging.
+First group to implement is VPL only, VPL+ffmpeg, VPL+OpenCL, and VPL+OpenVINO 
 
-
-Coverage/Intended Scope       
------------------------
-
-The scope of what we are claiming will work together includes:
-
- #. intel-gpu-media (media driver, libva, VPL)
- #. Additional graphics APIs (Vulkan, OpenGL, ...)
- #. Media frameworks + VPL plugins (FFmpeg *_qsv codecs and GStreamer MediaSDK plugin)
- #. intel-gpu-compute and projects that work on top of it (oneAPI, OpenVINO, ITEX, IPEX)
-
-
-This project provides a set of basic command lines runnable by internal teams and customers to evaluate if their environment is 
-set up correctly to support our interoperability claims.  
-
-As smoke tests we simply check for crash, empty output, etc.  More sophisticated tests can be added as interoperability improves.
-
-KPIs are out of scope.  They could be added but we don't want to disrupt any current KPI ownership or HW program milestones. 
+Publishing mechanism
+--------------------
+Example command lines and tests to be published via github repository.  
+Link to public github repository to be provided on VPL website.
+This repo is to develop the concept before we set up path to publication.
 
 
-Supported Hardware
-------------------
+Supported Hardware and OSes
+---------------------------
 
-Project currently supports Xe and newer GPUs, including Intel(r) Arc(tm) A-series.
-(Not tested yet on Flex, but Arc is assumed to be a reasonable proxy)
+Hardware and OSes documented at https://dgpu-docs.intel.com/
+This repository will focus on latest Ubuntu and Redhat in Q2.
 
 
 Setup Steps
 ------------
 
 Setup steps are internal only to bootstrap the project.
-By external release we should have reasonable metapackages available.    
-
-**Composeable components**:
-
-Graphics + compute stack (including VPL):
- - Arc A-series: ``arc_setup1.sh; reboot; arc_setup2.sh; reboot``
- - Gen12: ``gen12_setup.sh; reboot``
-
-Openvino: ``openvino_setup.sh``
-
-FFmpeg: ``ffmpeg_setup.sh``
-
+By external release we should have reasonable metapackages available.
 
 
 How to Run Tests
@@ -86,6 +69,14 @@ How to Run Tests
   $ cd cmdlines
   $ python runcmd.py -c test_cmds.yaml
 
+
+How simplicity and good UX will be preserved as expanded
+--------------------------------------------------------
+
+ - yaml files any python runner are self documenting
+ - focus on published example command lines only forces # of test cases to stay small
+ - utilities can list which test sets are available and which are runnable in the current environment
+ - concurrent work to simplify stack install with composable metapackages replaces the need for long + error prone descriptions of environment setup
 
 Contributing
 ------------

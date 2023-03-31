@@ -1,0 +1,14 @@
+---
+
+dependencies:
+- intel-gpu-media
+- ffmpeg-qsv
+
+cmdlines: 
+
+
+- name: FFmpeg qsv hwaccel signs of life
+  description: ffmpeg qsv decode without output indicates if environment has basic ingredients to support FFmpeg VPL plugin
+  commands:
+    - ffmpeg -hwaccel qsv -c:v hevc_qsv -i content/cars_320x240.h265 -f null -
+  expect: "frame=   30"

@@ -1,0 +1,19 @@
+---
+
+dependencies:
+- intel-gpu-media
+- intel-gpu-compute
+- openvino==2022.3.0
+
+cmdlines: 
+
+- name: Signs of life for media+OpenVINO
+  description: simple decode->resize->infer object detection pipeline
+  commands:
+    - pushd vpl-infer
+    - rm -rf build; mkdir build; pushd build; cmake ..; make
+    - ./vpl-infer -i ../../content/cars_320x240.h265 -m ../../content/public/mobilenet-ssd/FP32/mobilenet-ssd.xml -hw
+    - popd; popd
+  expect: "Decoded 30 frames and detected objects"
+
+
