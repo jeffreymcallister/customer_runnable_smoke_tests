@@ -13,8 +13,8 @@ import os.path
 import sys
 from contextlib import contextmanager
 import yaml
-import pexpect
-
+#import pexpect
+import subprocess
 
 def config_file(path):
     """
@@ -35,7 +35,7 @@ def read_command_line(cmd_line=None):
         formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-c", "--config", type=config_file, help="Configuration file", required=True)
     parser.add_argument("-o", "--output", help="Destination file", default="cmds.md")
-    parser.add_argument("-f", "--format", choices=["shell", "md"], default="md")
+    parser.add_argument("-f", "--format", choices=["shell", "md"], default="shell")
     # parse arguments (will exit here on invalid args or help)
 
     try:
@@ -50,13 +50,32 @@ def read_command_line(cmd_line=None):
 
     return args
 
-#def add_shell_commands(step, outfile,install_prefix):
-#    for cmd in step['commands']:
-#        outfile.write("RUN "+cmd+"\n")
     
 
-def process_cmd(step, outfile):
+def process_cmd_shell(step, outfile):
+    print("running "+step['name'])
+    cmd=""
+    for cmdstep in step['commands']:
+        print(cmd+"\n")
+        cmd+=cmdstep + " && "
+    cmd+=" echo ''"
+    
+    out=subprocess.run(cmd,shell=True,capture_output=True)
+    #print(cmd)
+    #print(out.stdout)
+    expected_out=step['expect']
+    if (str(expected_out) in str(out.stdout)): print("PASS")
+    else: print("FAIL")
+
+def process_cmd_md(step, outfile):
     print("adding "+step['name'])
+    cmd=""
+    for cmdstep in step['commands']:
+        print(cmd+"\n")
+        cmd+=cmdstep + " && "
+    cmd+=" echo ''"
+    print(cmd)
+
 
 def main(args):
     """
@@ -75,7 +94,7 @@ def main(args):
 
         steps=yaml_obj['steps']
         for step in steps:
-            process_cmd(step, outfile)
+            if args.format=="shell": process_cmd_shell(step, outfile)
 
 
 if __name__ == '__main__':

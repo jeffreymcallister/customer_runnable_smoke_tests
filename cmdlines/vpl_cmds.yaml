@@ -2,27 +2,19 @@
 
 steps: 
 
-- name: setup
-  buildsystem: shell
+- name: system_analyzer
   commands:
-   - apt update 
-   - apt install -y git virt-what
+   - system_analyzer 
+  expect: "Implementation #0" 
+
+- name: sample_decode
+  commands:
+   - sample_decode h265 -i content/cars_320x240.h265
+  expect: "Decoding finished"
+
+- name: sample_multi_transcode
+  commands:
+    - sample_multi_transcode -i::h265 content/cars_320x240.h265 -o::h265 NUL
+  expect: "PASSED"
 
 
-- name: update-kernel
-  buildsystem: shell
-  commands:
-   - VIRTENV=`virt-what`
-   - if [[ ! "$VIRTENV" =~ .*"docker".* ]]; then
-   - "   add-apt-repository -y ppa:cappelikan/ppa"
-   - "   apt update && apt -y install mainline"
-   - "   add-apt-repository -y --remove ppa:cappelikan/ppa"
-   - "   mainline --install-latest --yes"
-   - fi
-
-- name: intel-gpu-firmware
-  buildsystem: shell
-  commands:
-   - git clone https://github.com/intel-gpu/intel-gpu-firmware
-   - mkdir -p /lib/firmware/updates/i915
-   - cp intel-gpu-firmware/firmware/*.bin /lib/firmware/updates/i915
