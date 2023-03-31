@@ -1,0 +1,20 @@
+---
+
+steps: 
+
+- name: system_analyzer
+  commands:
+   - system_analyzer 
+  expect: "Implementation #0" 
+
+- name: sample_decode
+  commands:
+   - sample_decode h265 -i content/cars_320x240.h265
+  expect: "Decoding finished"
+
+- name: sample_multi_transcode
+  commands:
+    - sample_multi_transcode -i::h265 content/cars_320x240.h265 -o::h265 NUL
+  expect: "PASSED"
+
+

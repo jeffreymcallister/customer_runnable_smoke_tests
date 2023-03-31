@@ -3,6 +3,7 @@ if (( $EUID != 0 )); then
     exit
 fi
 
+source setproxy.sh
 apt-get update
 
 apt-get -y install \
@@ -25,5 +26,7 @@ apt-get install -y \
   level-zero-dev \
   libdrm-dev wayland-protocols libx11-dev libx11-xcb-dev libxcb-present-dev libxcb-dri3-dev \
   cmake build-essential pkg-config libva-dev libva-drm2 net-tools ifupdown \
-  libvpl-dev libvpl-tools
+  libvpl-dev libvpl-tools python3 python3-pip
 
+
+echo 'Reboot system for changes to take effect'
