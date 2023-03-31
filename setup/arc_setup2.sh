@@ -3,6 +3,7 @@ if (( $EUID != 0 )); then
     exit
 fi
 
+source setproxy.sh
 apt-get update
 
 apt-get -y install \

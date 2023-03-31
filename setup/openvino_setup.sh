@@ -3,6 +3,7 @@ if (( $EUID != 0 )); then
     exit
 fi
 
+source setproxy.sh
 apt-get update
 
 apt install -y python3 python3-pip opencl-headers libpugixml-dev libtbb-dev libtbb2

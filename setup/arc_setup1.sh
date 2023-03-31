@@ -3,6 +3,7 @@ if (( $EUID != 0 )); then
     exit
 fi
 
+source setproxy.sh
 apt update
 apt install -y gpg-agent wget
 wget -qO - https://repositories.intel.com/graphics/intel-graphics.key | gpg --dearmor --output /usr/share/keyrings/intel-graphics.gpg

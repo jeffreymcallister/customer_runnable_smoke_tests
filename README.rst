@@ -63,13 +63,28 @@ Project currently supports Xe and newer GPUs, including Intel(r) Arc(tm) A-serie
 Setup Steps
 ------------
 
-Run setup/setup.sh on test system, bare metal Ubuntu 22.04 or in fresh Docker Ubuntu 22.04 container.
+Setup steps are internal only to bootstrap the project.
+By external release we should have reasonable metapackages available.    
 
-Note: setup steps are for bootstrapping only.  Purpose of the customer runnable steps is to test the installed stack.
+**Composeable components**:
+
+Graphics + compute stack (including VPL):
+ - Arc A-series: ``arc_setup1.sh; reboot; arc_setup2.sh; reboot``
+ - Gen12: ``gen12_setup.sh; reboot``
+
+Openvino: ``openvino_setup.sh``
+
+FFmpeg: ``ffmpeg_setup.sh``
+
 
 
 How to Run Tests
 ----------------
+
+.. code-block:: bash
+
+  $ cd cmdlines
+  $ python runcmd.py -c test_cmds.yaml
 
 
 Contributing
