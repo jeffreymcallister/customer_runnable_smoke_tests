@@ -1,5 +1,5 @@
-Customer Runnable Linux Media + AI Smoke Tests
-==============================================
+Customer Runnable Linux Media+AI pipeline smoke tests
+=====================================================
 
 .. contents::
 
@@ -7,38 +7,68 @@ Customer Runnable Linux Media + AI Smoke Tests
 Background
 ----------
 
-Reason for adding customer runnable tests: out-of-box experience remains poor, especially beyond basic media.
+Intel out-of-box experience remains poor for users attempting to access our GPU capabilities.
+The experience becomes worse as the stack becomes taller.
 
-Approach used for this project: focus on the example command lines we would tell customers to run as they are getting started.
-This gap has been identified in multiple DX studies, so this area is clear for us to own w/o extensive negotiations.
-These command lines we document must include interoperability with more than the basic media stack.
+This project has 2 goals:
+ **external**: customers need a simple way to check that their environment is suitable to run media+AI pipelines
+ **internal**: drive consensus on supported/validated configurations so that component, validation, and release teams have at least minimal guidance.  Without a clear definition each team must work harder to define their own validated configurations and deal with reported issues. 
 
 Scope for test cases
 ---------------------
-A *short* list (<50 total) of command lines used in our documentation. 
- - NOT VPL-only acceptance tests
- - NOT lower level VPL-only component level tests
+A *short* list (<50 total) of command lines expected to work in well defined install configurations.
+Each test will be expressed as a statement that is clearly true or false.
+Multiple tests can be available for each stack configuration.
+In the initial implementation all tests will run by default, but in the future a configuration file will be added to turn off tests not intended to work.
 
-Interop scenarios are our new default.  Media only is an increasingly rare corner case.
-While it is theoretically possible to set up a system with everything, everything enabled is a rare corner case.
+Metapackage definitions used in the table below:
+ - intel-gpu-media = gmmlib, media driver, libdrm, libva, libvpl
+ - intel-gpu-compute = gmmlib, L0, opencl, …
+ - intel-ffmpeg = ffmpeg build enabling all Intel capabilities (vaapi and qsv)
+ - intel-gstreamer = gstreamer build including vaapi and VPL plugins
 
-Direction for Linux releases is composable packages.  Some examples of configurations to document:
- #. apt install intel-gpu-media (VPL only)
- #. apt install intel-gpu-media, then build ffmpeg with --enable-vpl
- #. apt install intel-gpu-media, then build gstreamer with VPL plugin
- #. apt install intel-gpu-media + intel-gpu-compute (openCL)
- #. apt install intel-gpu-media + intel-gpu-compute + openvino
- #. apt install intel-gpu-media + Vulkan
- #. apt install intel-gpu-media + Mesa (openGL)
+Long term goal is to sync definitions here with  https://github.com/intel-sandbox/jpk.package-test/blob/main/docs/meta-packages.md
 
-Project scope is smoke tested example command lines for every composable media stack scenario we claim in our marketing.
-We will only provide a few command lines (<5) for each package install scenario, just enough to fulfill the goal of basic
-smoke tests that the configuration works.
 
-Subset to prioritize in Q2
---------------------------
-Simple is hard.  Just getting buy-in on a subset of the <50 total example command lines will be challenging.
-First group to implement is VPL only, VPL+ffmpeg, VPL+OpenCL, and VPL+OpenVINO 
++-----------------------------------------------------------+----------------------------------------------------+
+| Stack components                                          | Test case names                                    |
++===========================================================+====================================================+
+| | apt install intel-gpu-media                             | | Libva-only pipeline works                        |
+| |                                                         | | VPL-only pipeline works                          |
++-----------------------------------------------------------+----------------------------------------------------+
+| | apt install intel-gpu-compute                           | | Opencl-only pipeline works                       |
+| |                                                         | | Intel graphics compiler works                    |
++-----------------------------------------------------------+----------------------------------------------------+
+| | apt install intel-gpu-media intel-ffmpeg                | | FFmpeg vaapi hwaccel pipeline works              |
+|                                                           | | FFmpeg qsv hwaccel pipeline works                |
++-----------------------------------------------------------+----------------------------------------------------+
+| | apt install intel-gpu-media  intel-gstreamer            | | Gstreamer vaapi plugin works                     |
+| |                                                         | | Gstreamer msdk/VPL plugin works                  |
++-----------------------------------------------------------+----------------------------------------------------+
+| apt install intel-gpu-media  libva-dev                    | VPL + libva pipeline works                         |
++-----------------------------------------------------------+----------------------------------------------------+
+| apt install intel-gpu-media  intel-gpu-compute            | VPL + OpenCL pipeline works, VPL+L0 pipeline works |
++-----------------------------------------------------------+----------------------------------------------------+
+| apt install intel-gpu-media  intel-gpu-compute  openvino  | VPL + OpenVINO pipeline works                      |
++-----------------------------------------------------------+----------------------------------------------------+
+| apt install intel-gpu-media + Vulkan dev install          | VPL + Vulkan pipeline works                        |
++-----------------------------------------------------------+----------------------------------------------------+
+| apt install intel-gpu-media + OpenGL dev install          | VPL+OpenGL pipeline works                          |
++-----------------------------------------------------------+----------------------------------------------------+
+| | apt install intel-gpu-media intel-ffmpeg + ITEX         | | FFmpeg vaapi hwaccel + ITEX pipeline works       |
+| |                                                         | | FFmpeg qsv hwaccel + ITEX pipeline works         |
++-----------------------------------------------------------+----------------------------------------------------+
+| | apt install intel-gpu-media intel-gstreamer + ITEX      | | Gstreamer vaapi plugin works w/ITEX              |
+| |                                                         | | Gstreamer msdk/VPL plugin works w/ITEX           |
++-----------------------------------------------------------+----------------------------------------------------+
+| | apt install intel-gpu-media intel-ffmpeg + IPEX         | | FFmpeg vaapi hwaccel + IPEX pipeline works       |
+| |                                                         | | FFmpeg qsv hwaccel + IPEX pipeline works         |
++-----------------------------------------------------------+----------------------------------------------------+
+| | apt install intel-gpu-media intel-gstreamer + IPEX      | | Gstreamer vaapi plugin works w/ITEX              |
+| |                                                         | | Gstreamer msdk/VPL plugin works w/ITEX           |
++-----------------------------------------------------------+----------------------------------------------------+
+
+
 
 Publishing mechanism
 --------------------
@@ -68,6 +98,7 @@ How to Run Tests
 
   $ cd cmdlines
   $ python runcmd.py -c test_cmds.yaml
+(next update: run.sh)
 
 
 How simplicity and good UX will be preserved as expanded
