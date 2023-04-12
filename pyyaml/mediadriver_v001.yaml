@@ -3,6 +3,15 @@
 layername: mediadriver_stack
 install_prefix: /usr/local
 
+env:
+  - HTTP_PROXY=http://proxy-dmz.intel.com:911
+  - https_proxy=http://proxy-dmz.intel.com:912
+  - http_proxy=http://proxy-dmz.intel.com:911
+  - HTTPS_PROXY=http://proxy-dmz.intel.com:912
+  - PKG_CONFIG_PATH=/usr/local/share/pkgconfig
+  - no_proxy=
+  - NO_PROXY=
+
 
 steps:
 
@@ -51,20 +60,20 @@ steps:
 - name: intel-media-driver
   buildsystem: cmake
   dir: media-driver
-  config-opts: -DENABLE_PRODUCTION_KMD=ON
+  configopts: "-DENABLE_PRODUCTION_KMD=ON"
   giturl:  https://github.com/intel/media-driver.git
   branch: intel-media-22.6.5
 
 - name: intel-onevpl-gpu
   buildsystem: cmake
   dir: oneVPL-intel-gpu
-  config-opts: "-DMFX_ENABLE_AENC=ON"
+  configopts: "-DMFX_ENABLE_AENC=ON"
   giturl: https://github.com/oneapi-src/oneVPL-intel-gpu.git
   branch: intel-onevpl-22.6.5
 
 - name: intel-onevpl-dispatcher
   buildsystem: cmake
   dir: oneVPL
-  config-opts: "-DCMAKE_INSTALL_PREFIX=/usr/local"
+  configopts: "-DCMAKE_INSTALL_PREFIX=/usr/local"
   giturl: https://github.com/oneapi-src/oneVPL.git
   branch: v2023.1.3

@@ -51,8 +51,13 @@ def read_command_line(cmd_line=None):
     return args
 
 def add_shell_commands(step, outfile,install_prefix):
-    for cmd in step['commands']:
-        outfile.write("RUN "+cmd+"\n")
+    cmds=step['commands']
+    outfile.write("RUN "+cmds[0]+" && \\\n")
+
+    for i in range(1,len(cmds)-1):
+        outfile.write("  "+cmds[i]+" && \\\n")
+
+    outfile.write("  "+cmds[len(cmds)-1])
     
 def add_autotools_commands(step, outfile,install_prefix):
     outfile.write("    ./autogen.sh && \\ \n")
@@ -60,16 +65,27 @@ def add_autotools_commands(step, outfile,install_prefix):
     outfile.write("     make && make install ")
 
 def add_meson_commands(step, outfile,install_prefix):
-    outfile.write(F"    meson --prefix={install_prefix}")
+    outfile.write(F"    meson --prefix={install_prefix} ")
     outfile.write(F"--libdir={install_prefix}/lib builddir && \\ \n")
     outfile.write("    ninja -C builddir install  \n")
 
 def add_cmake_commands(step, outfile,install_prefix):
+    if 'configopts' in step:
+        configopts=step['configopts']
+    else:
+        configopts=""
+
     outfile.write("    mkdir -p build && cd build && \\ \n")
-    outfile.write(F"    cmake -DCMAKE_INSTALL_PREFIX={install_prefix} .. && \\ \n")
+    outfile.write(F"    cmake -DCMAKE_INSTALL_PREFIX={install_prefix} {configopts} .. && \\ \n")
     outfile.write("    make -j && make install \n")
 
-def build_layer(layerfile, outfile):
+
+def add_env_setup_docker(targetstack, outfile):
+    for envline in targetstack['env']:
+        outfile.write(F"ARG {envline}\n")
+    outfile.write("\n\n")
+
+def build_layer(layerfile, outfile, outformat):
     with open(layerfile, encoding='utf-8') as layer_src:
         try:
             targetstack = yaml.safe_load(layer_src)
@@ -81,6 +97,10 @@ def build_layer(layerfile, outfile):
         install_prefix=targetstack['install_prefix']
     else:
         install_prefix="/usr/local"
+
+
+    if outformat=="docker":
+        add_env_setup_docker(targetstack, outfile)        
 
     steps = targetstack['steps']
     for step in steps:
@@ -131,9 +151,10 @@ def main(args):
         if args.format=="docker":
             outfile.write("FROM "+yaml_obj['os']+"\n\n")
 
+
         stack_layers=yaml_obj['stack_layers']
         for layer in stack_layers:
-            build_layer(layer,outfile)
+            build_layer(layer,outfile,args.format)
 
 if __name__ == '__main__':
     main(read_command_line())
